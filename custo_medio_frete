@@ -1,0 +1,120 @@
+A. Distância e características da rota
+São os indicadores que determinam a dimensão física da operação.
+Indicador	        Unidade	Aplicação
+Distância total	                km	        Base para cálculo do custo
+Distância com carga	            km	        Custo dos quilômetros produtivos
+Distância sem carga	            km	        Custo de deslocamentos improdutivos
+% de retorno vazio	            %	        Mede ineficiência da operação
+Quantidade de pedágios	        unidades	Identifica incidência de tarifas
+Custo total de pedágio	        R$	        Custo direto da rota
+Tempo estimado de viagem	    horas	    Impacta motorista e produtividade
+Tempo de espera	                horas	    Mede custo de ociosidade
+Índice de dificuldade da rota	índice	    Considera relevo, tráfego e condições da estrada
+
+B. Combustível
+Provavelmente um dos componentes mais relevantes do custo operacional.
+Indicador	                        Unidade	    Aplicação
+Preço médio do diesel	            R$/litro	Custo de abastecimento
+Consumo médio do veículo	        km/l	    Eficiência energética
+Consumo por tipo de operação	    km/l	    Diferenciação por rota e carga
+Consumo estimado de combustível	    litros	    Necessidade de abastecimento
+Custo de combustível por            km	R$/km	Custo unitário
+Variação do diesel	                %	        Atualização das estimativas
+
+C. Veículos e manutenção
+Indicador	                Unidade	Aplicação
+Custo de manutenção	        R$/km	                Manutenção preventiva e corretiva
+Custo de pneus	            R$/km	                Desgaste e substituição
+Vida útil dos pneus	        km	                    Projeção de reposição
+Depreciação	                R$/km	                Perda de valor do veículo
+Idade média da frota	    anos	                Indicador de eficiência e risco
+Custo de seguro	            R$/viagem ou R$/mês	    Proteção patrimonial e da carga
+Custo de licenciamento	    R$/ano	                Rateio por operação
+Disponibilidade da frota	%	                    Produtividade operacional
+
+D. Mão de obra e operação
+Indicador	                Unidade	        Aplicação
+Custo do motorista	        R$/mês	        Salário e encargos
+Custo de diária	            R$/dia	        Viagens prolongadas
+Horas de viagem	            horas	        Dimensionamento da mão de obra
+Horas de espera	            horas	        Custo de ociosidade
+Custo de carregamento	    R$/operação	    Movimentação da carga
+Custo de descarregamento	R$/operação	    Movimentação da carga
+Número de paradas	        unidades	    Impacto na produtividade
+
+E. Características da carga
+Esse grupo permite diferenciar o custo de transportar diferentes tipos de mercadoria.
+Indicador	                    Unidade	Aplicação
+Peso da carga	                toneladas	Capacidade utilizada
+Volume	                        m³	        Ocupação volumétrica
+Densidade	                    kg/m³	    Relação entre peso e volume
+Valor da mercadoria	            R$	        Exposição ao risco
+Tipo de carga	                categoria	Características específicas
+Necessidade de refrigeração	    sim/não	    Custo adicional
+Necessidade de carga especial	sim/não	    Adaptações operacionais
+Taxa de ocupação	            %	        Eficiência da utilização do veículo
+
+
+
+Variável	                    Referência sugerida	                            Unidade
+Distância total da viagem	    Variável por rota	                            km
+Distância de retorno	        100% da ida, se retorno ao ponto de origem	    km
+Tipo de veículo	Carreta         5–6 eixos	                                    categoria *
+Capacidade de carga	            27–32	                                        toneladas
+Peso da mercadoria	            25–27	                                        toneladas
+Tipo de mercadoria	            Carga geral	                                    categoria
+Consumo médio	                2,5–3,0	                                        km/l
+Preço do diesel S10	            7,30	                                        R$/litro
+Pedágios da rota	            Variável por rota	                            R$
+Manutenção	                    0,30–0,60	                                    R$/km
+Pneus e recapagem	            0,25–0,40	                                    R$/km
+Motorista	                    0,80–1,20	                                    R$/km equivalente
+Custos fixos rateados	        0,90–1,40	                                    R$/km
+Percentual de retorno vazio	    30% como premissa inicial	                    %
+
+
+
+3 Eixos
+Componente	    Custo estimado
+Combustível	    R$ 2,28/km
+Manutenção	    R$ 0,35/km
+Pneus	        R$ 0,22/km
+Motorista	    R$ 0,90/km
+Custos fixos	R$ 0,95/km
+Subtotal	    R$ 4,70/km
+
+5 Eixos
+Componente	    Custo estimado
+Combustível	    R$ 2,70/km
+Manutenção	    R$ 0,45/km
+Pneus	        R$ 0,32/km
+Motorista	    R$ 1,00/km
+Custos fixos	R$ 1,15/km
+Subtotal	    R$ 5,62/km
+
+7 Eixos
+Componente	    Custo estimado
+Combustível	    R$ 3,65/km
+Manutenção	    R$ 0,60/km
+Pneus	        R$ 0,42/km
+Motorista	    R$ 1,15/km
+Custos fixos	R$ 1,55/km
+Subtotal	    R$ 7,37/km
+
+Consumo de referência (km/l)
+3e 3.2
+5e 2.7
+7e 2.0
+consumo_medio = {
+    "3e": 3.2,
+    "5e": 2.7,
+    "7e": 2.0
+}
+
+Indicador	    3 eixos (mín.)	Base	Máx.	7 eixos (mín.)	Base	Máx.
+Combustível	    2,03	        2,28	2,43	3,32	        3,65	4,06
+Manutenção	    0,25	        0,35	0,50	0,45	        0,60	0,80
+Pneus	        0,15	        0,22	0,30	0,30	        0,42	0,55
+Motorista	    0,70	        0,90	1,10	0,90	        1,15	1,40
+Custos fixos	0,75	        0,95	1,20	1,20	        1,55	1,90
+Total R$/km	    3,88	        4,70	5,53	6,17	        7,37	8,71
