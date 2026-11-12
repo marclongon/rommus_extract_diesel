@@ -1,4 +1,3 @@
-# %%
 from dataclasses import dataclass
 
 @dataclass
@@ -31,36 +30,16 @@ class Frete:
             "Custos fixos": 1.55,
             "Margem": 0.20
         },
-    }
+    }    
 
 
-    def calcular(self, df_anp, eixos, distancia_km, regiao = None, estado = None):
+    def calcular(self, df_anp, eixos, distancia_km, visao = "br", local = None):
         if eixos not in self.consumo_km_por_litro:
             raise ValueError("Necessidade de informacao de 3, 5 ou 7 eixos.")
         if distancia_km <= 0:
-            raise ValueError("A distância deve ser maior que zero.")
+            raise ValueError("A distância deve ser maior que zero.")      
 
-        #Utiliza dados de combustivel da ANP
-        if regiao is None and estado is None:
-            df_anp_br = (
-                df_anp.groupby("Produto")["Valor de Venda"]
-                .mean()
-            )
-            diesel_s10 = df_anp_br.iloc[0]
-        elif regiao is not None:
-            df_anp_reg = (
-                df_anp.groupby("Regiao - Sigla")["Valor de Venda"]
-                .mean()
-            )
-            diesel_s10 = df_anp_est.loc[regiao]
-        elif estado is not None:
-            df_anp_est = (
-                df_anp.groupby("Estado - Sigla")["Valor de Venda"]
-                .mean()
-            )
-            diesel_s10 = df_anp_est.loc[estado]
-    
-
+        df_anp_hist, diesel_s10 = resumo_diesel_s10(df_anp, visao = visao, local = local)
         custo_combustivel_km = (
             diesel_s10 / self.consumo_km_por_litro[eixos]
         )
@@ -78,15 +57,63 @@ class Frete:
         preco_por_km = custo_por_km  / (1-margem)
         margem_por_km = preco_por_km * margem
 
-        return {
-            "preco_combustivel": round(float(diesel_s10),2),
+        return df_anp_hist, {
+            "preco_combustivel": diesel_s10,
             "custos_por_km": custos,
             "custo_medio_por_km": custo_por_km,
             "preco_medio_por_km": preco_por_km,
             "margem_media_por_km": margem_por_km,
             "custo_estimado": custo_por_km * distancia_km,
             "frete_estimado": preco_por_km * distancia_km,
-            "margem_estimada": margem_por_km * distancia_km
+            "margem_estimada": margem_por_km * distancia_km,
         }
 
+def resumo_diesel_s10(df_anp, visao = "br", local = None):
+    visoes = ["br", "regiao", "estado"]
+    regioes = ["N", "NE", "CO", "SE", "S"]
+    estados = ["AC", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT",
+    "PA", "PB", "PE", "PR", "RJ", "RN", "RO", "RR", "RS", "SC", "SE",
+    "SP", "AL", "TO", "AP", "PI"]
 
+    import pandas as pd
+    pd.set_option("display.multi_sparse", False)
+
+    if visao not in visoes:
+        raise ValueError("O local informado nao e valido")
+    else:
+        if visao == "br":
+            df_anp_hist = (
+                    df_anp.groupby(["anomes", "Produto"])["Valor de Venda"]
+                    .mean()
+                    .reset_index()
+                    .sort_index(ascending = True)
+            )
+            diesel_s10 = df_anp_hist.iloc[-1]["Valor de Venda"]
+        elif visao == "regiao":
+            if local in regioes:
+                df_anp_hist = (
+                        df_anp.groupby(["anomes", "Regiao - Sigla"])["Valor de Venda"]
+                        .mean()
+                        .reset_index()
+                        .sort_index(ascending = True)
+                )
+                df_anp_hist = df_anp_hist[df_anp_hist["Regiao - Sigla"] == local]
+                diesel_s10 = df_anp_hist.iloc[-1]["Valor de Venda"]
+            else:
+                raise ValueError("O local informado nao e valido")
+        elif visao == "estado":
+            if local in estados:
+                df_anp_hist = (
+                        df_anp.groupby(["anomes", "Estado - Sigla"])["Valor de Venda"]
+                        .mean()
+                        .reset_index()
+                        .sort_index(ascending = True)
+                )
+                df_anp_hist = df_anp_hist[df_anp_hist["Estado - Sigla"] == local]
+                diesel_s10 = df_anp_hist.iloc[-1]["Valor de Venda"]
+            else:
+                raise ValueError("O local informado nao e valido")
+
+        diesel_s10 = round(float(diesel_s10),2)
+        
+    return df_anp_hist, diesel_s10

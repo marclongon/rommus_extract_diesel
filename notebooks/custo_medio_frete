@@ -118,3 +118,7 @@ Pneus	        0,15	        0,22	0,30	0,30	        0,42	0,55
 Motorista	    0,70	        0,90	1,10	0,90	        1,15	1,40
 Custos fixos	0,75	        0,95	1,20	1,20	        1,55	1,90
 Total R$/km	    3,88	        4,70	5,53	6,17	        7,37	8,71
+
+
+
+extract_task >> transform_task >> load_staging_task >> validate_task >> merge_task
