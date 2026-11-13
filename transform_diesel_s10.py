@@ -1,4 +1,5 @@
 import pandas as pd
+from decimal import Decimal
 
 def transform(df_anp):
     print(f"\n{df_anp.info()}\n")
@@ -12,29 +13,58 @@ def transform(df_anp):
         errors="coerce"
     )
     df_anp["anomes"] = df_anp["Data da Coleta"].dt.strftime("%Y-%m")
+    df_anp["Data da Coleta"] = df_anp["Data da Coleta"].dt.date
 
-    # Adequa valor ao padrao americano
-    df_anp["Valor de Venda"] = pd.to_numeric(
-        df_anp["Valor de Venda"].astype("string").str.replace(",", ".", regex=False),
-        errors="coerce"
+    df_anp["Valor de Venda"] = (
+        df_anp["Valor de Venda"]
+        .astype("string")
+        .str.replace(",", ".", regex=False)
+        .map(lambda valor: Decimal(valor) if valor and valor.strip() else None)
     )
 
+    df_anp["Valor de Compra"] = (
+        df_anp["Valor de Venda"]
+        .astype("string")
+        .str.replace(",", ".", regex=False)
+        .map(lambda valor: Decimal(valor) if valor and valor.strip() else None)
+    )
+
+    df_anp["address"] = (
+        df_anp["Nome da Rua"].astype("string").fillna("").str.strip() + ", " + 
+        df_anp["Numero Rua"].astype("string").fillna("").str.strip()
+    ).str.strip()
+    df_anp.drop(columns=["Nome da Rua", "Numero Rua"], inplace=True)
+
+    df_anp["ingested_at"] = pd.Timestamp.now(tz="UTC")
+    df_anp["source_id"] = "anp"
+    df_anp["source_type"] = "official"
+    
     df_anp.reset_index()
 
-    # Reducao de colunas para o necessario
-    df_anp = df_anp[["anomes", "Regiao - Sigla", "Estado - Sigla", "Municipio", "Produto",
-                    "Data da Coleta", "Valor de Venda", "Bandeira"]]
-
     df_anp = df_anp.rename(columns={
-                    "anomes": "anomes", 
-                    "Regiao - Sigla": "regiao_sigla",
-                    "Estado - Sigla": "estado_sigla",
-                    "Municipio": "municipio",
-                    "Produto": "produto",
-                    "Data da Coleta": "data_coleta",
-                    "Valor de Venda": "valor_venda",
-                    "Bandeira": "bandeira"
+                    "Revenda": "legal_name",
+                    "Regiao - Sigla": "region",
+                    "Estado - Sigla": "state",
+                    "Municipio": "municipality_name",
+                    "Produto": "product",
+                    "Data da Coleta": "captured_on",
+                    "Valor de Venda": "sell_value",
+                    "Bandeira": "brand",
+                    "CNPJ da Revenda": "cnpj",
+                    "Endereco": "address",
+                    "Complemento": "address_complement",
+                    "Bairro": "neighborhood",
+                    "Cep": "postal_code",
+                    "Valor de Compra": "purchase_value",
+                    "Unidade de Medida": "measurement_unit"
     })
+
+    df_anp = df_anp[["captured_on", "ingested_at", "legal_name", "cnpj", 
+                     "address", "address_complement", "neighborhood", 
+                     "postal_code", "region", "state", "municipality_name", 
+                     "product", "sell_value", "purchase_value", "measurement_unit", 
+                     "brand", "source_id", "source_type"
+    ]]
 
     print(f"\n{df_anp.info()}")
 

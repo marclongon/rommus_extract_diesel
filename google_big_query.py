@@ -8,20 +8,24 @@ print("Projeto:", projeto)
 client = bigquery.Client(project=projeto, credentials=credenciais)
 
 # Cria tabela no Bigquery
-sql_path = Path("sql/schemas/diesel_s10.sql")
-sql = sql_path.read_text(encoding="utf-8")
+sql_raw_path = Path("sql/schemas/diesel_s10_raw.sql")
+sql_raw = sql_raw_path.read_text(encoding="utf-8")
+query_job = client.query(sql_raw)
+query_job.result()
 
-query_job = client.query(sql)
+sql_raw_staging_path = Path("sql/schemas/diesel_s10_raw_staging.sql")
+sql_raw_staging = sql_raw_staging_path.read_text(encoding="utf-8")
+query_job = client.query(sql_raw_staging)
 query_job.result()
 
 def validar_duplicidades():
 
-    sql_path = Path(
-        "sql/validations/val_diesel_s10.sql"
+    sql_val_path = Path(
+        "sql/validations/diesel_s10_val.sql"
     )
 
-    sql = sql_path.read_text(encoding="utf-8")
-    resultado = client.query(sql).result()
+    sql_val = sql_val_path.read_text(encoding="utf-8")
+    resultado = client.query(sql_val).result()
 
     duplicidades = list(resultado)
 
@@ -41,7 +45,7 @@ def validar_duplicidades():
 
 def carregar_bigquery(df):
 
-    staging_table = "rommus.staging.diesel_s10"
+    staging_table = "gen-lang-client-0722386172.rommus_staging_diesel_s10_raw_staging.diesel_s10"
 
     # 1. Carregar dados na staging
     job_config = bigquery.LoadJobConfig(
@@ -63,7 +67,7 @@ def carregar_bigquery(df):
 
     # 3. Executar MERGE
     sql_path = Path(
-        "sql/transformations/merge_diesel_s10.sql"
+        "sql/transformations/diesel_s10_merge.sql"
     )
 
     sql = sql_path.read_text(encoding="utf-8")

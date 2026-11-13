@@ -4,7 +4,7 @@ from urllib.error import HTTPError
 def extract():
     meses = pd.date_range(
         end=pd.Timestamp.today().replace(day=1),
-        periods=4,
+        periods=13,
         freq="MS"
     )
 
